@@ -1,6 +1,7 @@
 #!/bin/sh
 
-for i in `seq 64695 64833`;  #63Cu
+#for i in `seq 64695 64833`;  #63Cu
+for i in `seq 67339 67401`;  #59Co
 do
     echo Processing Run: $i;
     ./DANCE_Alpha_Calibrator $i
