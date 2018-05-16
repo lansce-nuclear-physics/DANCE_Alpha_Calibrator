@@ -12,7 +12,7 @@
 //   The resulting slope and offset modifies and creates //
 //    a calibration for use with a specfied run          //
 //                                                       //
-//  Usage:  ./DANCE_Alpha_Calibrator(RNUM1,RNUM2,...)    //
+//  Usage:  ./DANCE_Alpha_Calibrator RNUM1 RNUM2 ...     //
 //                                                       //
 //        Christopher J. Prokop      12/19/2016          //
 //*******************************************************//
@@ -39,16 +39,19 @@ int main(int argc, char *argv[]) {
   string pathtofile = "/home/cprokop/FARE/FARE_v10_ajc/Calibrations/";  //CURRENTLY NOT USED! THIS WOULD OVERWRITE CALIBRATIONS IN FARE
 
   //Prefix of Param File Name
-  string filenameprefix = "/home/cprokop/FARE/CJP/DANCE_Alpha_Calibrator/ParamOutput/param_out_";   
+  string filenameprefix = "/home/cprokop/CJP/DANCE_Alpha_Calibrator/ParamOutput/param_out_";   
 
   //Suffix of Param File Name
   string filenamesuffix = ".txt"; 
 
   //Path to the root files
-   string pathtorootfile = "/home/cprokop/FARE/CJP/DANCE_Analysis/stage0_root/";
+   string pathtorootfile = "/home/cprokop/CJP/DANCE_Analysis/stage0_root/";
   
   //Prefix of File Name
   string histofilenameprefix = "Stage0_Histograms_Run_";   
+
+  //Suffix of File Name
+  string histofilenamesuffix = "_500ns_CW_0ns_CBT_0ns_DEBT.root";   
 
   //Name of the TDirectory that the alpha spectra are stored in
   string alphafoldername = "Standard/AlphaSpectra";
@@ -56,10 +59,10 @@ int main(int argc, char *argv[]) {
   //Prefix of Raw uncalibrated Alpha Histogram Name
   string alphahistonameprefix = "hAlpha";
 
-  string pathtorootoutput = "/home/cprokop/FARE/CJP/DANCE_Alpha_Calibrator/RootOutput/";
+  string pathtorootoutput = "/home/cprokop/CJP/DANCE_Alpha_Calibrator/RootOutput/";
     
   //Path to the "DANCE_Alpha_Database.root" file
-  string pathtodatabase="/home/cprokop/FARE/CJP/";
+  string pathtodatabase="./DANCE_Alpha_Database/";
 
   //Warn the user if the chisquare/NDF goes above this value
   Double_t chisquarewarning = 3.5; 
@@ -86,7 +89,7 @@ int main(int argc, char *argv[]) {
     start>>junkvalue>>starting_offset[i]>>starting_slope[i]>>junkvalue>>junkvalue>>junkvalue;
     starting_offset[i] /= 1000.0;
     starting_slope[i] /= 1000.0;
-    cout<<i<<" offset: "<<starting_offset[i]<<"  slope: "<<starting_slope[i]<<endl;
+//    cout<<i<<" offset: "<<starting_offset[i]<<"  slope: "<<starting_slope[i]<<endl;
   }
   
   bool failedfit=false;
@@ -101,7 +104,7 @@ int main(int argc, char *argv[]) {
     fname<<pathtorootfile.c_str();
     fname<<histofilenameprefix.c_str();
     fname<<rnums[i];
-    fname<<".root";
+    fname<<histofilenamesuffix.c_str();
 
     //  cout<<"File: "<<fname.str().c_str()<<endl;
     
@@ -117,11 +120,11 @@ int main(int argc, char *argv[]) {
     }
     //cout<<fin<<endl;
   }
-  cout<<"Alpha 2D: "<<hAlpha<<endl;
+  //cout<<"Alpha 2D: "<<hAlpha<<endl;
   
   for(int jay=0; jay<numberofdetectors; jay++) {
     hDet[jay] = (TH1D*)hAlpha->ProjectionX(Form("Alpha_%d",jay),jay+1,jay+1);
-    cout<<hDet[jay]<<endl;
+   // cout<<hDet[jay]<<endl;
   }
   
   //Rebin them
@@ -168,9 +171,8 @@ int main(int argc, char *argv[]) {
       spectrum to "match" the template is then used to adjust the calib_ideal file and make a 
       unique calibration for this specific run. 
     */
-    
-    //Fit the histogram
-    //  ftot[j] = new TF1(Form("ftot_%d",j),ftotal,100,20000,3);  //one fit function for each detector
+
+    if(hDet[j]->GetEntries() > 0) {
 
     //Autodetermine the fit range
     int maxheight = hDet[j]->GetBinContent(hDet[j]->GetMaximumBin());
@@ -184,7 +186,7 @@ int main(int argc, char *argv[]) {
 	lower_limit = hDet[j]->GetXaxis()->GetBinCenter(k-1);
 	break;
       }
-    }
+  }
 
     for(int k=hDet[j]->GetNbinsX()-10; k>0; k--) {
       if(hDet[j]->GetBinContent(k) > fit_threshold) {
@@ -243,7 +245,7 @@ int main(int argc, char *argv[]) {
     }
     
     //Output fit results 
-    cout<<"Detector: "<<j<<"  "<<ftot[j]->GetChisquare()/(1.*ftot[j]->GetNDF())<<"   Slope: "<<1000*ftot[j]->GetParameter(0)<<"   Offset: "<<1000*ftot[j]->GetParameter(1)<<endl;
+//    cout<<"Detector: "<<j<<"  "<<ftot[j]->GetChisquare()/(1.*ftot[j]->GetNDF())<<"   Slope: "<<1000*ftot[j]->GetParameter(0)<<"   Offset: "<<1000*ftot[j]->GetParameter(1)<<endl;
     
     //Store results in output rootfiles
     for(int k=0; k<(int)rnums.size(); k++) {
@@ -261,12 +263,24 @@ int main(int argc, char *argv[]) {
       Offset[j] = starting_offset[j];
     }
     
-  }
-  
+}
+else {
+
+if(j!=76 && j!=86) {
+failedfits.push_back(j);
+//            failedfit=true;
+Slope[j] = starting_slope[j];
+      Offset[j] = starting_offset[j];
+
+} 
+
+
+}
+ } 
   cout<<"Fitting concluded."<<endl;
   
   //Display number of fits with too large of chisquare/NDF
-  cout<<"There were "<<failedfits.size()<<" failed fits"<<endl;
+//  cout<<"There were "<<failedfits.size()<<" failed fits"<<endl;
   
   //Bools for the interface
   bool makecal=true;
