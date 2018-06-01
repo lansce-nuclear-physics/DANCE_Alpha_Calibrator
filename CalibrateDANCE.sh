@@ -1,12 +1,32 @@
 #!/bin/sh
 
-#for i in `seq 64695 64833`;  #63Cu
-for i in `seq 100000 100015`;  #Sources
+#for i in `seq 60622 60811`;  #Pb208
+#for i in `seq 62695 62735`;  #Pb208
+#for i in `seq 63650 64136`;  #Pb208
+#for i in `seq 64834 64987`;  #Pb208
+#for i in `seq 68040 68103`;  #Pb208
+
+#for i in `seq 60409 60451`;  #Au197
+#for i in `seq 60572 60584`;  #Au197
+#for i in `seq 63590 63649`;  #Au197
+#for i in `seq 68104 68126`;  #Au197
+
+#for i in `seq 60834 61251`;  #Cu65
+#for i in `seq 63015 63589`;  #Cu65
+#for i in `seq 64137 64692`;  #Cu65
+#for i in `seq 64989 65265`;  #Cu65
+
+for i in `seq 64693 64833`;  #Cu63
+
+
+#for i in `seq 60828 60833`;  #Y88
+#for i in `seq 60364 60369`;  #Y88
+#for i in `seq 61292 61296`;  #Y88
+
 do
     echo Processing Run: $i;
     ./DANCE_Alpha_Calibrator $i
 done
-
 
 #./DANCE_Alpha_Calibrator 31929 31930 31931 31932 31933 31934 
 #./DANCE_Alpha_Calibrator 31935 31936 31937 31938 31939 

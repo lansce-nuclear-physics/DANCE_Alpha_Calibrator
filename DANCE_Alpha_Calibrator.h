@@ -27,6 +27,7 @@
 #include "TH1.h"
 #include "TH2.h"
 #include "TF1.h"
+#include "TCanvas.h"
 
 using namespace std;
 

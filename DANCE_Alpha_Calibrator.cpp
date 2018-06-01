@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
   string filenamesuffix = ".txt"; 
 
   //Path to the root files
-   string pathtorootfile = "/home/cprokop/CJP/DANCE_Analysis/stage0_root/";
+  string pathtorootfile = "/home/cprokop/CJP/DANCE_Analysis/stage0_root/";
   
   //Prefix of File Name
   string histofilenameprefix = "Stage0_Histograms_Run_";   
@@ -65,14 +65,21 @@ int main(int argc, char *argv[]) {
   string pathtodatabase="./DANCE_Alpha_Database/";
 
   //Warn the user if the chisquare/NDF goes above this value
-  Double_t chisquarewarning = 3.5; 
+  Double_t chisquarewarning = 15; //3.5
 
   //Number of refit attempts allowed per detector if the chisquare is above chisquarewarning
   int refitattemptlimit=5; 
 
+  int rebin_factor = 4;
+
   //End User Input.........................................//
 
+  TCanvas *cFitResults = new TCanvas("FitResults","FitResults");
+  cFitResults->Divide(18,9,0,0);
+  TCanvas *cTemp = new TCanvas("TEmp","Temp");
+
   TH2D *hAlpha;
+  TH1D *hChiSquare_NDF = new TH1D("hChiSquare_NDF","hChiSquare_NDF",162,0,162);
   
   //Get the run numbers 
   for(int i=1; i<argc; i++) {
@@ -89,7 +96,7 @@ int main(int argc, char *argv[]) {
     start>>junkvalue>>starting_offset[i]>>starting_slope[i]>>junkvalue>>junkvalue>>junkvalue;
     starting_offset[i] /= 1000.0;
     starting_slope[i] /= 1000.0;
-//    cout<<i<<" offset: "<<starting_offset[i]<<"  slope: "<<starting_slope[i]<<endl;
+    //    cout<<i<<" offset: "<<starting_offset[i]<<"  slope: "<<starting_slope[i]<<endl;
   }
   
   bool failedfit=false;
@@ -113,10 +120,12 @@ int main(int argc, char *argv[]) {
 
     //get the alpha 2D
     if(i==0) {
-      hAlpha = (TH2D*)fin->FindObjectAny("hAlpha");
+      hAlpha = (TH2D*)fin->Get("hAlpha");
+      // cout<<"here"<<endl;
     }
     else {
-      hAlpha->Add((TH2D*)fin->FindObjectAny("hAlpha"));
+      hAlpha->Add((TH2D*)fin->Get("hAlpha"));
+      // cout<<"hopefully not here"<<endl;
     }
     //cout<<fin<<endl;
   }
@@ -124,12 +133,12 @@ int main(int argc, char *argv[]) {
   
   for(int jay=0; jay<numberofdetectors; jay++) {
     hDet[jay] = (TH1D*)hAlpha->ProjectionX(Form("Alpha_%d",jay),jay+1,jay+1);
-   // cout<<hDet[jay]<<endl;
+    //cout<<jay<<"  "<<hDet[jay]->Integral()<<endl;
   }
   
   //Rebin them
   for(int j=0; j<numberofdetectors; j++) {
-    // hDet[j]->Rebin(2);
+    hDet[j]->Rebin(rebin_factor);
   }
 
   //stringstream the database filename
@@ -155,11 +164,14 @@ int main(int argc, char *argv[]) {
   //Loop over number of detectors
   for(int j=0; j<numberofdetectors; j++) {
 
+    cTemp->cd();
+
     failedfit=false;
     //  cout<<"j  "<<j<<endl;
 
     //Project the template 2D to 1Ds
     hProj[j] = (TH1D*)hDatabase->ProjectionX(Form("Template_Detector_%d",j),j+1,j+1); //bins start at 1 dets at 0
+    hProj[j]->Rebin(rebin_factor);
     hProj[j]->GetXaxis()->SetRangeUser(0.25,4.75);  //set the range over the useful part of the alpha spectra
     // cout<<hProj[j]->GetEntries()<<endl;  //cout the number of entries in the template
     
@@ -174,113 +186,126 @@ int main(int argc, char *argv[]) {
 
     if(hDet[j]->GetEntries() > 0) {
 
-    //Autodetermine the fit range
-    int maxheight = hDet[j]->GetBinContent(hDet[j]->GetMaximumBin());
+      //Autodetermine the fit range
+      int maxheight = hDet[j]->GetBinContent(hDet[j]->GetMaximumBin());
 
-    int fit_threshold = 0.125*maxheight;
-    int lower_limit=0;
-    int upper_limit=0;
+      int fit_threshold = 0.1*maxheight;
+      int lower_limit=0;
+      int upper_limit=0;
     
-    for(int k=10; k<hDet[j]->GetNbinsX(); k++) {
-      if(hDet[j]->GetBinContent(k) > fit_threshold) {
-	lower_limit = hDet[j]->GetXaxis()->GetBinCenter(k-1);
-	break;
-      }
-  }
-
-    for(int k=hDet[j]->GetNbinsX()-10; k>0; k--) {
-      if(hDet[j]->GetBinContent(k) > fit_threshold) {
-	upper_limit = hDet[j]->GetXaxis()->GetBinCenter(k+1);
-	break;
-      }
-    }
-    
-    //  cout<<j<<"  "<<maxheight<<"  L : "<<lower_limit<<"  U : "<<upper_limit<<endl;
-
-    
-
-    ftot[j] = new TF1(Form("ftot_%d",j),ftotal,lower_limit,upper_limit,3);  //one fit function for each detector
-
-    ftot[j]->SetLineColor(2);  //make it red
-    ftot[j]->SetNpx(hProj[j]->GetNbinsX());  //make the number of points one-to-one with the bins for good graphics
-
-    hDet[j]->GetXaxis()->SetRangeUser(100,20000);
-    // ftot[j]->SetParameter(0,(1.0*hProj[j]->GetMean()/(1.0*hDet[j]->GetMean())));   
-    ftot[j]->SetParameter(0,starting_slope[j]);   
-    ftot[j]->SetParameter(1,starting_offset[j]);   
-  
-    ftot[j]->SetParLimits(1,-0.1,0.1);
-    ftot[j]->SetParLimits(0,0.00025,0.00035);
-
-    ftot[j]->SetParameter(2,hProj[j]->Integral()/hDet[j]->Integral());
- 
-    if(hTemp)  hTemp->Reset();  //reset the histogram
-    hTemp = (TH1D*)hProj[j]->Clone();  //clone the template because the fit function didnt like arrays :/
-    hTemp->Rebin(4);
-    // cout<<hTemp->GetEntries()<<endl;
-    
-    //Fit a few times initially
-    hDet[j]->Fit(Form("ftot_%d",j),"RQMN");
-    hDet[j]->Fit(Form("ftot_%d",j),"RQMN");
-    hDet[j]->Fit(Form("ftot_%d",j),"RQM");
-
-    //Check to see if the chisquare/NDF is reasonable
-    if((ftot[j]->GetChisquare()/(1.*ftot[j]->GetNDF()))>chisquarewarning) {
-      //if not refit a few times
-      for(int k=0; k<refitattemptlimit; k++) {
-	cout<<"Refitting Detector "<<j<<" Attempt "<<k+1<<endl;
-	hDet[j]->Fit(Form("ftot_%d",j),"RQM");
-	//check to see if the fit is good now
-	if((ftot[j]->GetChisquare()/(1.*ftot[j]->GetNDF()))<chisquarewarning) {
+      for(int k=10; k<hDet[j]->GetNbinsX(); k++) {
+	if(hDet[j]->GetBinContent(k) > fit_threshold) {
+	  lower_limit = hDet[j]->GetXaxis()->GetBinCenter(k-1);
 	  break;
 	}
-	//if it keeps failing give up and add it to the failedfits vector
-	else {
-	  if (k==(refitattemptlimit-1)) {
-	    failedfits.push_back(j);
-	    failedfit=true;
+      }
+
+      for(int k=hDet[j]->GetNbinsX()-10; k>0; k--) {
+	if(hDet[j]->GetBinContent(k) > fit_threshold) {
+	  upper_limit = hDet[j]->GetXaxis()->GetBinCenter(k+1);
+	  break;
+	}
+      }
+    
+      //  cout<<j<<"  "<<maxheight<<"  L : "<<lower_limit<<"  U : "<<upper_limit<<endl;
+
+    
+
+      ftot[j] = new TF1(Form("ftot_%d",j),ftotal,lower_limit,upper_limit,3);  //one fit function for each detector
+
+      ftot[j]->SetLineColor(2);  //make it red
+      ftot[j]->SetNpx(hProj[j]->GetNbinsX());  //make the number of points one-to-one with the bins for good graphics
+
+      hDet[j]->GetXaxis()->SetRangeUser(100,20000);
+      ftot[j]->SetParameter(0,(1.0*hProj[j]->GetMean()/(1.0*hDet[j]->GetMean())));   
+      // ftot[j]->SetParameter(0,starting_slope[j]);   
+      ftot[j]->SetParameter(1,starting_offset[j]);   
+
+      ftot[j]->SetParLimits(1,-0.1,0.1);
+      ftot[j]->SetParLimits(0,0.00023,0.00035);
+
+      //ftot[j]->SetParameter(2,hProj[j]->Integral()/hDet[j]->Integral());
+      //   ftot[j]->FixParameter(2,hProj[j]->Integral()/hDet[j]->Integral());
+      // ftot[j]->FixParameter(2,hDet[j]->Integral()/hProj[j]->Integral());
+       double ratio = hDet[j]->Integral()/hProj[j]->Integral();
+       // cout<<"j: "<<j<<"  Det: "<<hDet[j]->Integral()<<"  Proj: "<<hProj[j]->Integral()<<" ratio: "<<ratio<<endl;
+       ftot[j]->SetParameter(2,ratio/2.0);
+
+      if(hTemp)  hTemp->Reset();  //reset the histogram
+      hTemp = (TH1D*)hProj[j]->Clone();  //clone the template because the fit function didnt like arrays :/
+      // hTemp->Rebin(rebin_factor);
+      // cout<<hTemp->GetEntries()<<endl;
+    
+      //Fit a few times initially
+      hDet[j]->Fit(Form("ftot_%d",j),"RQMN");
+      hDet[j]->Fit(Form("ftot_%d",j),"RQMN");
+
+      //Check to see if the chisquare/NDF is reasonable
+      if((ftot[j]->GetChisquare()/(1.*ftot[j]->GetNDF()))>chisquarewarning) {
+	//if not refit a few times
+	for(int k=0; k<refitattemptlimit; k++) {
+	  //	cout<<"Refitting Detector "<<j<<" Attempt "<<k+1<<endl;
+	  hDet[j]->Fit(Form("ftot_%d",j),"RQMN");
+	  //check to see if the fit is good now
+	  if((ftot[j]->GetChisquare()/(1.*ftot[j]->GetNDF()))<chisquarewarning) {
+	    break;
+	  }
+	  //if it keeps failing give up and add it to the failedfits vector
+	  else {
+	    if (k==(refitattemptlimit-1)) {
+	      failedfits.push_back(j);
+	      failedfit=true;
+	    }
 	  }
 	}
       }
+
+      hDet[j]->Fit(Form("ftot_%d",j),"RQM+");
+
+      hChiSquare_NDF->Fill(j,(ftot[j]->GetChisquare()/(1.*ftot[j]->GetNDF())));
+			   
+      //Output fit results 
+      //    cout<<"Detector: "<<j<<"  "<<ftot[j]->GetChisquare()/(1.*ftot[j]->GetNDF())<<"   Slope: "<<1000*ftot[j]->GetParameter(0)<<"   Offset: "<<1000*ftot[j]->GetParameter(1)<<endl;
+    
+      //Store results in output rootfiles
+      for(int k=0; k<(int)rnums.size(); k++) {
+	fout[k]->cd();
+	hDet[j]->Write();
+	hProj[j]->Write();
+	ftot[j]->Write();
+      }
+    
+      //And in arrays
+      Slope[j] = ftot[j]->GetParameter(0);
+      Offset[j] = ftot[j]->GetParameter(1);
+
+      /*
+	if(failedfit) {
+	Slope[j] = starting_slope[j];
+	Offset[j] = starting_offset[j];
+	}
+      */
+
+    cFitResults->cd(j+1);
+    hDet[j]->Draw();
     }
-    
-    //Output fit results 
-//    cout<<"Detector: "<<j<<"  "<<ftot[j]->GetChisquare()/(1.*ftot[j]->GetNDF())<<"   Slope: "<<1000*ftot[j]->GetParameter(0)<<"   Offset: "<<1000*ftot[j]->GetParameter(1)<<endl;
-    
-    //Store results in output rootfiles
-    for(int k=0; k<(int)rnums.size(); k++) {
-      fout[k]->cd();
-      hDet[j]->Write();
-      hProj[j]->Write();
+
+    else {
+      if(j!=76 && j!=86) {
+	failedfits.push_back(j);
+	//            failedfit=true;
+	Slope[j] = starting_slope[j];
+	Offset[j] = starting_offset[j];
+      } 
     }
-    
-    //And in arrays
-    Slope[j] = ftot[j]->GetParameter(0);
-    Offset[j] = ftot[j]->GetParameter(1);
-
-    if(failedfit) {
-      Slope[j] = starting_slope[j];
-      Offset[j] = starting_offset[j];
-    }
-    
-}
-else {
-
-if(j!=76 && j!=86) {
-failedfits.push_back(j);
-//            failedfit=true;
-Slope[j] = starting_slope[j];
-      Offset[j] = starting_offset[j];
-
-} 
 
 
-}
- } 
-  cout<<"Fitting concluded."<<endl;
+
+  } 
+  //  cout<<"Fitting concluded."<<endl;
   
   //Display number of fits with too large of chisquare/NDF
-//  cout<<"There were "<<failedfits.size()<<" failed fits"<<endl;
+  //  cout<<"There were "<<failedfits.size()<<" failed fits"<<endl;
   
   //Bools for the interface
   bool makecal=true;
@@ -381,8 +406,11 @@ Slope[j] = starting_slope[j];
     cout<<"Calibration(s) Failed"<<endl;
   }
   
-
-  
+  for(int i=0; i<(int)rnums.size(); i++) {
+    fout[i]->cd();
+    cFitResults->Write();
+    hChiSquare_NDF->Write();
+  }
 
   //Write the output root file
   //  fout->Write();

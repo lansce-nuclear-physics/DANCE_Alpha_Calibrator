@@ -20,12 +20,13 @@
 //User Input.............................................//
 
 //Number of runs to include
-const int nruns = 3;
+const int nruns = 4;
 
 //These are the runs that will be included in the database
 //Int_t run_numbers[nruns] = {38108 , 38109 , 38110 };  
 //Int_t run_numbers[nruns] = {41985 , 41986 , 41987 , 41988 , 41989};  
-Int_t run_numbers[nruns] = {59078, 59079, 59080};  
+//Int_t run_numbers[nruns] = {59078, 59079, 59080};  
+Int_t run_numbers[nruns] = {61292, 61293, 61294, 61295};  
 
 //Path to the root files
 string pathtorootfile = "/home/cprokop/CJP/DANCE_Analysis/stage1_root/";
@@ -33,12 +34,12 @@ string pathtorootfile = "/home/cprokop/CJP/DANCE_Analysis/stage1_root/";
 //Prefix of File Name
 string histofilenameprefix = "Stage1_Histograms_Run_";
 
-string histofilenamesuffix = "_10ns_CW_2000ns_CBT_0ns_DEBT.root"
+string histofilenamesuffix = "_10ns_CW_2000ns_CBT_0ns_DEBT.root";
 
 //End User Input.........................................//
 
 
-void DANCE_Alpha_Database_Creator() {
+  void DANCE_Alpha_Database_Creator() {
 
   //Template is stored in a 2D Histogram
   TH2D *hDanceAlphaDatabase;
@@ -55,7 +56,7 @@ void DANCE_Alpha_Database_Creator() {
     fname<<pathtorootfile.c_str();
     fname<<histofilenameprefix.c_str();
     fname<<run_numbers[i];
-    fname<<".root";
+    fname<<histofilenamesuffix.c_str();
     
     cout<<"Processing: "<<fname.str()<<endl;
 
@@ -65,6 +66,8 @@ void DANCE_Alpha_Database_Creator() {
     if(i==0) {
       hDanceAlphaDatabase = (TH2D*)fin->Get("hAlphaCalib");
       hDanceGammaDatabase = (TH2D*)fin->Get("hGammaCalib");
+      hDanceAlphaDatabase->SetName("hDanceAlphaDatabase");
+      hDanceGammaDatabase->SetName("hDanceGammaDatabase");
     }
     else {
       hDanceAlphaDatabase->Add((TH2D*)fin->Get("hAlphaCalib"));
