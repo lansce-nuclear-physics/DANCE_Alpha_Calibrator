@@ -1,0 +1,34 @@
+//***************************//
+//*  Christopher J. Prokop  *//
+//*  cprokop@lanl.gov       *//
+//*  README                 *// 
+//*  Last Edit: 06/05/18    *//  
+//***************************//
+
+The purpose of this document is to explain how the program works.
+
+The DANCE Alpha Calibrator takes the raw alpha spectra for each run and calibrates them to the DANCE_Alpha_Database.
+
+
+1) Prerequisites
+  
+  In the .cpp file make sure all the file paths are correct such that the program can find the rootfiles, the database, and knows where to place the output
+
+  Make sure the DANCE_Alpha_Database is current (The resolution changes occasionally and fits will frequently fail if the spectral shapes of the data and database are discrepant).  See item 3
+
+2) Running the DANCE_Alpha_Calibrator
+
+FOR A Single Run
+    ./DANCE_Alpha_Calibrator RUN_NUMBER
+
+FOR A Set of Runs that will all then share the same calibration
+    ./DANCE_Alpga_Calibrator RUN_1 RUN_2 ... RUN_N-1 RUN_N
+
+3) Making the DANCE_Alpha_Database
+
+   Run the DANCE_Analysis with source data (Y88 or Na22 works best)
+   Run some version of a gamma fitter on the source data extracting the calibrations
+   Run the stage1 analysis of the source data with the new calibration files
+   Run the DANCE_Alpha_Database_Creator.C script after changing the run numbers of interest.  
+   
+   
