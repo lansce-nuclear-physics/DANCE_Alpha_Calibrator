@@ -20,13 +20,17 @@
 //User Input.............................................//
 
 //Number of runs to include
-const int nruns = 4;
+const int nruns = 2;
 
 //These are the runs that will be included in the database
 //Int_t run_numbers[nruns] = {38108 , 38109 , 38110 };  
 //Int_t run_numbers[nruns] = {41985 , 41986 , 41987 , 41988 , 41989};  
 //Int_t run_numbers[nruns] = {59078, 59079, 59080};  
-Int_t run_numbers[nruns] = {61292, 61293, 61294, 61295};  
+//Int_t run_numbers[nruns] = {61292, 61293, 61294, 61295};
+
+//Int_t run_numbers[nruns] = {67323,67324,67325};  
+
+Int_t run_numbers[nruns] = {100826,100827};  
 
 //Path to the root files
 string pathtorootfile = "/home/cprokop/CJP/DANCE_Analysis/stage1_root/";
@@ -34,7 +38,7 @@ string pathtorootfile = "/home/cprokop/CJP/DANCE_Analysis/stage1_root/";
 //Prefix of File Name
 string histofilenameprefix = "Stage1_Histograms_Run_";
 
-string histofilenamesuffix = "_10ns_CW_2000ns_CBT_0ns_DEBT.root";
+string histofilenamesuffix = "_10ns_CW_0ns_CBT_0ns_DEBT.root";
 
 //End User Input.........................................//
 
