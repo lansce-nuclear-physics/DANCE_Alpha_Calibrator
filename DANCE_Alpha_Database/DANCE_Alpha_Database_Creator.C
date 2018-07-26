@@ -20,7 +20,7 @@
 //User Input.............................................//
 
 //Number of runs to include
-const int nruns = 2;
+const int nruns = 4;
 
 //These are the runs that will be included in the database
 //Int_t run_numbers[nruns] = {38108 , 38109 , 38110 };  
@@ -30,7 +30,7 @@ const int nruns = 2;
 
 //Int_t run_numbers[nruns] = {67323,67324,67325};  
 
-Int_t run_numbers[nruns] = {100826,100827};  
+Int_t run_numbers[nruns] = {100837,100838,100839,100840};  
 
 //Path to the root files
 string pathtorootfile = "/home/cprokop/CJP/DANCE_Analysis/stage1_root/";
@@ -83,7 +83,7 @@ string histofilenamesuffix = "_10ns_CW_0ns_CBT_0ns_DEBT.root";
   }
   
   //Make output root file
-  TFile *fout = new TFile("DANCE_Alpha_Database.root","RECREATE");
+  TFile *fout = new TFile(Form("DANCE_Alpha_Database_%d_%d.root",run_numbers[0],run_numbers[nruns-1]),"RECREATE");
 
   //Write 2D histos
   hDanceAlphaDatabase->Write();
