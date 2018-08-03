@@ -20,7 +20,7 @@
 //User Input.............................................//
 
 //Number of runs to include
-const int nruns = 4;
+const int nruns = 3;
 
 //These are the runs that will be included in the database
 //Int_t run_numbers[nruns] = {38108 , 38109 , 38110 };  
@@ -29,8 +29,9 @@ const int nruns = 4;
 //Int_t run_numbers[nruns] = {61292, 61293, 61294, 61295};
 
 //Int_t run_numbers[nruns] = {67323,67324,67325};  
+Int_t run_numbers[nruns] = {60829,60830,60831};  
 
-Int_t run_numbers[nruns] = {100837,100838,100839,100840};  
+//Int_t run_numbers[nruns] = {100837,100838,100839,100840};  
 
 //Path to the root files
 string pathtorootfile = "/home/cprokop/CJP/DANCE_Analysis/stage1_root/";
