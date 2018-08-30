@@ -373,7 +373,7 @@ int main(int argc, char *argv[]) {
 	else { 
 	  //	  calibout<<j<<"  "<<1000.0*Offset[j]<<"  "<<1000.0*Slope[j]<<"  "<<0<<"  "<<0<<"  "<<12000.0*Slope[j]<<"\n";  //DANCE detectors
 	  //The short PSD gate was shortened before this block of runs
-	  if(i > 100639) {
+	  if(rnums[i] > 100639) {
 	    calibout<<j<<"  "<<1000.0*Offset[j]<<"  "<<1000.0*Slope[j]<<"  "<<0<<"  "<<0<<"  "<<6000.0*Slope[j]<<"\n";  //DANCE detectors
 	    lastout<<j<<"  "<<1000.0*Offset[j]<<"  "<<1000.0*Slope[j]<<"  "<<0<<"  "<<0<<"  "<<6000.0*Slope[j]<<"\n";  //DANCE detectors
 	  }
