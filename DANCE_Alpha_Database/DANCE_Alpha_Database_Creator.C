@@ -29,22 +29,22 @@ const int nruns = 3;
 //Int_t run_numbers[nruns] = {61292, 61293, 61294, 61295};
 
 //Int_t run_numbers[nruns] = {67323,67324,67325};  
-Int_t run_numbers[nruns] = {60829,60830,60831};  
-
+//Int_t run_numbers[nruns] = {104746, 104747, 104748, 104749, 104750};  
+Int_t run_numbers[nruns] = {113391,113392,113393};
 //Int_t run_numbers[nruns] = {100837,100838,100839,100840};  
 
 //Path to the root files
-string pathtorootfile = "/home/cprokop/CJP/DANCE_Analysis/stage1_root/";
+string pathtorootfile = "/home/cfry/DANCE_Analysis/stage1_root/";
 
 //Prefix of File Name
 string histofilenameprefix = "Stage1_Histograms_Run_";
 
-string histofilenamesuffix = "_10ns_CW_0ns_CBT_0ns_DEBT.root";
+string histofilenamesuffix = "_5ns_CW_0ns_CBT_0ns_DEBT.root";
 
 //End User Input.........................................//
 
 
-  void DANCE_Alpha_Database_Creator() {
+void DANCE_Alpha_Database_Creator() {
 
   //Template is stored in a 2D Histogram
   TH2D *hDanceAlphaDatabase;
@@ -89,6 +89,7 @@ string histofilenamesuffix = "_10ns_CW_0ns_CBT_0ns_DEBT.root";
   //Write 2D histos
   hDanceAlphaDatabase->Write();
   hDanceGammaDatabase->Write();
+
   
   //Write and Close
   fout->Write();

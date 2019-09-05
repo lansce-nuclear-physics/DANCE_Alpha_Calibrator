@@ -29,8 +29,8 @@ void ParamPlotter() {
   }
 
 
-  const int nruns=190;
-  int starting_run = 60622;
+  const int nruns=322;
+  int starting_run =104551;
 
   TH2D *hSlope = new TH2D("hSlope","hSlope",nruns,starting_run,starting_run+nruns,162,0,162);
   TH2D *hOffset = new TH2D("hOffset","hOffset",nruns,starting_run,starting_run+nruns,162,0,162);

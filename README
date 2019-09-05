@@ -22,7 +22,7 @@ FOR A Single Run
     ./DANCE_Alpha_Calibrator RUN_NUMBER
 
 FOR A Set of Runs that will all then share the same calibration
-    ./DANCE_Alpga_Calibrator RUN_1 RUN_2 ... RUN_N-1 RUN_N
+    ./DANCE_Alpha_Calibrator RUN_1 RUN_2 ... RUN_N-1 RUN_N
 
 3) Making the DANCE_Alpha_Database
 

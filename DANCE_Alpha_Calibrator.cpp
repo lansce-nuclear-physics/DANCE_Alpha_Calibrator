@@ -36,16 +36,16 @@ int main(int argc, char *argv[]) {
   //User Input.............................................//
 
   //Path to the parm_out_RUNNUMBER files
-  string pathtofile = "/home/cprokop/FARE/FARE_v10_ajc/Calibrations/";  //CURRENTLY NOT USED! THIS WOULD OVERWRITE CALIBRATIONS IN FARE
+  string pathtofile = "/home/cfry/FARE/FARE_v10_ajc/Calibrations/";  //CURRENTLY NOT USED! THIS WOULD OVERWRITE CALIBRATIONS IN FARE
 
   //Prefix of Param File Name
-  string filenameprefix = "/home/cprokop/CJP/DANCE_Alpha_Calibrator/ParamOutput/param_out_";   
+  string filenameprefix = "/home/cfry/DANCE_Alpha_Calibrator/ParamOutput/param_out_";   
 
   //Suffix of Param File Name
   string filenamesuffix = ".txt"; 
 
   //Path to the root files
-  string pathtorootfile = "/home/cprokop/CJP/DANCE_Analysis/stage0_root/";
+  string pathtorootfile = "/home/cfry/DANCE_Analysis/stage0_root_automated/";
   
   //Prefix of File Name
   string histofilenameprefix = "Stage0_Histograms_Run_";   
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
   //Prefix of Raw uncalibrated Alpha Histogram Name
   string alphahistonameprefix = "hAlpha";
 
-  string pathtorootoutput = "/home/cprokop/CJP/DANCE_Alpha_Calibrator/RootOutput/";
+  string pathtorootoutput = "/home/cfry/DANCE_Alpha_Calibrator/RootOutput/";
     
   //Path to the "DANCE_Alpha_Database.root" file
   string pathtodatabase="./DANCE_Alpha_Database/";
