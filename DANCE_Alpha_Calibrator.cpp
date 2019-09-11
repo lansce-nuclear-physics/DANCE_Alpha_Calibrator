@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
   //Read in the starting parameters
   
   ifstream start;
-  start.open("calib_ideal.dat"); //fix thisssssss!!!!
+  start.open("last_params.dat"); 
   
   double junkvalue=0;
   for(int i=0; i<162; i++) {
