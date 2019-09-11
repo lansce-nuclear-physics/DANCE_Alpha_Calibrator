@@ -11,10 +11,13 @@
 //  fit for each detector extracting a slope and offset. //
 //   The resulting slope and offset modifies and creates //
 //    a calibration for use with a specfied run          //
+//  Currently treats all subruns in a run together       //
+//                                                       //
 //                                                       //
 //  Usage:  ./DANCE_Alpha_Calibrator RNUM1 RNUM2 ...     //
 //                                                       //
 //        Christopher J. Prokop      12/19/2016          //
+//        Cathleen E. Fry            09/11/2019          //
 //*******************************************************//
 
 
@@ -45,7 +48,7 @@ int main(int argc, char *argv[]) {
   string filenamesuffix = ".txt"; 
 
   //Path to the root files
-  string pathtorootfile = "/home/cfry/DANCE_Analysis/stage0_root_automated/";
+  string pathtorootfile = "/home/cfry/DANCE_Analysis/stage0_root/";
   
   //Prefix of File Name
   string histofilenameprefix = "Stage0_Histograms_Run_";   
@@ -84,53 +87,100 @@ int main(int argc, char *argv[]) {
   //Get the run numbers 
   for(int i=1; i<argc; i++) {
     rnums.push_back(atoi(argv[i]));
+    //cout << rnums.back() << " " << rnums.size() << endl;
   }
 
   //Read in the starting parameters
   
   ifstream start;
-  start.open("last_params.txt");
+  start.open("calib_ideal.dat"); //fix thisssssss!!!!
   
   double junkvalue=0;
   for(int i=0; i<162; i++) {
     start>>junkvalue>>starting_offset[i]>>starting_slope[i]>>junkvalue>>junkvalue>>junkvalue;
     starting_offset[i] /= 1000.0;
     starting_slope[i] /= 1000.0;
-    //    cout<<i<<" offset: "<<starting_offset[i]<<"  slope: "<<starting_slope[i]<<endl;
+      //  cout<<i<<" offset: "<<starting_offset[i]<<"  slope: "<<starting_slope[i]<<endl;
   }
   
   bool failedfit=false;
+  bool usingsubruns=false;
+  int subrunnum=0;
+  
 
+  stringstream fname;
+  fname.str();
+  fname<<pathtorootfile.c_str();
+  fname<<histofilenameprefix.c_str();
+  fname<<rnums[0];
+  fname<<"_0";
+  fname<<histofilenamesuffix.c_str();
+  TFile* fin;// = new TFile (fname.str().c_str());
+
+  if (!gSystem->AccessPathName(fname.str().c_str())) {
+    usingsubruns=true;
+  }
+  else {
+    fname.str("");
+    fname<<pathtorootfile.c_str();
+    fname<<histofilenameprefix.c_str();
+    fname<<rnums[0];
+    fname<<histofilenamesuffix.c_str();
+  }
 
   //Read in the files
   for(int i=0; i<(int)rnums.size(); i++) {
 
-    //stringstream the root filename
-    stringstream fname;
-    fname.str();
-    fname<<pathtorootfile.c_str();
-    fname<<histofilenameprefix.c_str();
-    fname<<rnums[i];
-    fname<<histofilenamesuffix.c_str();
+  if (usingsubruns){
+    while (!gSystem->AccessPathName(fname.str().c_str())){
 
-    //  cout<<"File: "<<fname.str().c_str()<<endl;
-    
-    //Open the file
-    TFile *fin = new TFile(fname.str().c_str());
-
-    //get the alpha 2D
-    if(i==0) {
-      hAlpha = (TH2D*)fin->Get("hAlpha");
-      // cout<<"here"<<endl;
+        cout<<"File: "<<fname.str().c_str()<<endl;
+        //Open the file
+        fin = new TFile(fname.str().c_str());
+        //get the alpha 2D
+        if(i==0 && subrunnum==0) {
+          hAlpha = (TH2D*)fin->Get("hAlpha");
+        }
+        else {
+          hAlpha->Add((TH2D*)fin->Get("hAlpha"));
+        }
+        subrunnum++;
+        fname.str("");
+        fname<<pathtorootfile.c_str();
+        fname<<histofilenameprefix.c_str();
+        fname<<rnums[i];
+        fname<<"_";
+        fname<<subrunnum;  
+        fname<<histofilenamesuffix.c_str();
+      }
+      subrunnum=0;
+      fname.str("");
+      fname<<pathtorootfile.c_str();
+      fname<<histofilenameprefix.c_str();
+      fname<<rnums[i+1];
+      fname<<"_";
+      fname<<subrunnum;  
+      fname<<histofilenamesuffix.c_str();
     }
     else {
-      hAlpha->Add((TH2D*)fin->Get("hAlpha"));
-      // cout<<"hopefully not here"<<endl;
+      fname.str("");
+      fname<<pathtorootfile.c_str();
+      fname<<histofilenameprefix.c_str();
+      fname<<rnums[i];
+      fname<<histofilenamesuffix.c_str();
+      //Open the file
+      fin = new TFile(fname.str().c_str());
+      //get the alpha 2D
+      if(i==0) {
+        hAlpha = (TH2D*)fin->Get("hAlpha");
+      }
+      else {
+        hAlpha->Add((TH2D*)fin->Get("hAlpha"));
+      }
     }
-    //cout<<fin<<endl;
   }
   //cout<<"Alpha 2D: "<<hAlpha<<endl;
-  
+
   for(int jay=0; jay<numberofdetectors; jay++) {
     hDet[jay] = (TH1D*)hAlpha->ProjectionX(Form("Alpha_%d",jay),jay+1,jay+1);
     //cout<<jay<<"  "<<hDet[jay]->Integral()<<endl;
@@ -218,12 +268,13 @@ int main(int argc, char *argv[]) {
 
       hDet[j]->GetXaxis()->SetRangeUser(100,20000);
       ftot[j]->SetParameter(0,(1.0*hProj[j]->GetMean()/(1.0*hDet[j]->GetMean())));   
-      // ftot[j]->SetParameter(0,starting_slope[j]);   
-      ftot[j]->SetParameter(1,starting_offset[j]);   
+      ftot[j]->SetParameter(0,starting_slope[j]);   
+      //ftot[j]->SetParameter(1,starting_offset[j]);   
 
       ftot[j]->SetParLimits(1,-0.1,0.1);
-      ftot[j]->SetParLimits(0,0.00023,0.00035);
-      //  ftot[j]->SetParLimits(0,0.00023,0.00035);
+      //cout << j << "\t" << starting_slope[j] << "\t" << 1.0*hProj[j]->GetMean()/(1.0*hDet[j]->GetMean()) << endl;
+      ftot[j]->SetParLimits(0,0.00030,0.00042); 
+      //  ftot[j]->SetParLimits(0,0.00023,0.00035); //comment the line above and go back here for 2018 data
 
       //ftot[j]->SetParameter(2,hProj[j]->Integral()/hDet[j]->Integral());
       //   ftot[j]->FixParameter(2,hProj[j]->Integral()/hDet[j]->Integral());
