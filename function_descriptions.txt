@@ -1,0 +1,14 @@
+DANCE_Alpha_Calibrator.cpp - Double_t ftotal(Double_t *x, Double_t *par) 
+
+This function is the fit function used to fit the spectra
+
+
+DANCE_Alpha_Calibrator.cpp - int main(int argc, char *argv[]) 
+
+This is the main function of the program.  It reads the ROOT files, obtains the histograms, loads the calibrated alpha spectrum database, defines the fit functions, fits the spectra to obtain the DANCE calibration, and saves the results to both txt and ROOT files.
+
+
+
+./DANCE_Alpha_Database/DANCE_Alpha_Database_Creator.C -   void DANCE_Alpha_Database_Creator()
+
+This function reads opens a list of ROOT files which have calibrated alpha spectra in them and creates a 2D histogram of detector number vs calibrated alpha energy.  This 2D histogram is saved in a ROOT file and used as the database for the DANCE Alpha Calibrator.
