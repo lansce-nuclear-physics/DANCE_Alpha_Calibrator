@@ -51,7 +51,10 @@ void DANCE_Alpha_Database_Creator() {
   
   //Gamma Matrix is also stored in a 2D Histogram to see how good the calibration is
   TH2D *hDanceGammaDatabase;
-  
+
+  char* alphahistname="ESlow_ID_alphaNoPU";
+  char* gammahistname="ESlow_ID_gammaNoPU";
+
   //Loop over the nruns
   for(int i=0; i<nruns; i++) {
     
@@ -69,8 +72,21 @@ void DANCE_Alpha_Database_Creator() {
     TFile *fin = new TFile(fname.str().c_str());
     
     if(i==0) {
-      hDanceAlphaDatabase = (TH2D*)fin->Get("hAlphaCalib");
-      hDanceGammaDatabase = (TH2D*)fin->Get("hGammaCalib");
+      if(!fin->GetListOfKeys()->Contains(alphahistname)){
+        alphahistname="hAlphaCalib";
+        if (!fin->GetListOfKeys()->Contains(alphahistname)){
+          alphahistname="ESlow_ID_alpha";
+        }
+      }
+      if(!fin->GetListOfKeys()->Contains(gammahistname)){
+        alphahistname="hGammaCalib";
+        if (!fin->GetListOfKeys()->Contains(alphahistname)){
+          alphahistname="ESlow_ID_gamma";
+        }
+      }
+	    
+      hDanceAlphaDatabase = (TH2D*)fin->Get(alphahistname);
+      hDanceGammaDatabase = (TH2D*)fin->Get(gammahistname);
       hDanceAlphaDatabase->SetName("hDanceAlphaDatabase");
       hDanceGammaDatabase->SetName("hDanceGammaDatabase");
     }
