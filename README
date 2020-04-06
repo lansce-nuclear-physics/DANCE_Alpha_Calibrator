@@ -1,8 +1,10 @@
 //***************************//
 //*  Christopher J. Prokop  *//
 //*  cprokop@lanl.gov       *//
+//*  Cathleen E. Fry        *//
+//*  cfry@lanl.gov          *//
 //*  README                 *// 
-//*  Last Edit: 06/05/18    *//  
+//*  Last Edit: 04/03/20    *//  
 //***************************//
 
 The purpose of this document is to explain how the program works.
@@ -12,7 +14,7 @@ The DANCE Alpha Calibrator takes the raw alpha spectra for each run and calibrat
 
 1) Prerequisites
   
-  In the .cpp file make sure all the file paths are correct such that the program can find the rootfiles, the database, and knows where to place the output
+  In the .cpp file make sure all the file paths are correct such that the program can find the rootfiles, the database, and knows where to place the output.  Inputs can be from either the new or old analyzer naming scheme (changed in version 11.3)
 
   Make sure the DANCE_Alpha_Database is current (The resolution changes occasionally and fits will frequently fail if the spectral shapes of the data and database are discrepant).  See item 3
 
@@ -31,4 +33,6 @@ FOR A Set of Runs that will all then share the same calibration
    Run the stage1 analysis of the source data with the new calibration files
    Run the DANCE_Alpha_Database_Creator.C script after changing the run numbers of interest.  
    
-   
+4) Set last_params.txt
+   If you have a calibration file you have closest to the runs you're trying to calibrate   
+   If you don't have something nearby, calib_ideal for the appropriate year isn't a terrible choice

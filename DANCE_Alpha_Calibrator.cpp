@@ -17,7 +17,7 @@
 //  Usage:  ./DANCE_Alpha_Calibrator RNUM1 RNUM2 ...     //
 //                                                       //
 //        Christopher J. Prokop      12/19/2016          //
-//        Cathleen E. Fry            09/11/2019          //
+//        Cathleen E. Fry            04/03/2020          //
 //*******************************************************//
 
 
@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
   string filenamesuffix = ".txt"; 
 
   //Path to the root files
-  string pathtorootfile = "/home/cfry/DANCE_Analysis/stage0_root/";
+  string pathtorootfile = "/home/cfry/DANCE_Analysis/stage0_root_automated/";
   
   //Prefix of File Name
   string histofilenameprefix = "Stage0_Histograms_Run_";   
@@ -115,6 +115,7 @@ int main(int argc, char *argv[]) {
   fname<<rnums[0];
   fname<<"_0";
   fname<<histofilenamesuffix.c_str();
+  char* alphahistname="ISlow_ID_alphaNoPU";
   TFile* fin;// = new TFile (fname.str().c_str());
 
   if (!gSystem->AccessPathName(fname.str().c_str())) {
@@ -130,8 +131,8 @@ int main(int argc, char *argv[]) {
 
   //Read in the files
   for(int i=0; i<(int)rnums.size(); i++) {
-
-  if (usingsubruns){
+  
+   if (usingsubruns){
     while (!gSystem->AccessPathName(fname.str().c_str())){
 
         cout<<"File: "<<fname.str().c_str()<<endl;
@@ -139,10 +140,16 @@ int main(int argc, char *argv[]) {
         fin = new TFile(fname.str().c_str());
         //get the alpha 2D
         if(i==0 && subrunnum==0) {
-          hAlpha = (TH2D*)fin->Get("hAlpha");
+          if(!fin->GetListOfKeys()->Contains(alphahistname)){
+            alphahistname="hAlpha";
+            if (!fin->GetListOfKeys()->Contains(alphahistname)){
+              alphahistname="ISlow_ID_alpha";
+            }
+          }
+          hAlpha = (TH2D*)fin->Get(alphahistname);
         }
         else {
-          hAlpha->Add((TH2D*)fin->Get("hAlpha"));
+          hAlpha->Add((TH2D*)fin->Get(alphahistname));
         }
         subrunnum++;
         fname.str("");
@@ -172,10 +179,16 @@ int main(int argc, char *argv[]) {
       fin = new TFile(fname.str().c_str());
       //get the alpha 2D
       if(i==0) {
-        hAlpha = (TH2D*)fin->Get("hAlpha");
+        if(!fin->GetListOfKeys()->Contains(alphahistname)){
+          alphahistname="hAlpha";;
+          if (!fin->GetListOfKeys()->Contains(alphahistname)){
+            alphahistname="ISlow_ID_alpha";
+          }
+        }
+        hAlpha = (TH2D*)fin->Get(alphahistname);
       }
       else {
-        hAlpha->Add((TH2D*)fin->Get("hAlpha"));
+        hAlpha->Add((TH2D*)fin->Get(alphahistname));
       }
     }
   }
@@ -273,8 +286,8 @@ int main(int argc, char *argv[]) {
 
       ftot[j]->SetParLimits(1,-0.1,0.1);
       //cout << j << "\t" << starting_slope[j] << "\t" << 1.0*hProj[j]->GetMean()/(1.0*hDet[j]->GetMean()) << endl;
-      ftot[j]->SetParLimits(0,0.00030,0.00042); 
-      //  ftot[j]->SetParLimits(0,0.00023,0.00035); //comment the line above and go back here for 2018 data
+      //ftot[j]->SetParLimits(0,0.00030,0.00042); 
+        ftot[j]->SetParLimits(0,0.00021,0.00035); //comment the line above and go back here for 2018 data
 
       //ftot[j]->SetParameter(2,hProj[j]->Integral()/hDet[j]->Integral());
       //   ftot[j]->FixParameter(2,hProj[j]->Integral()/hDet[j]->Integral());
