@@ -1,3 +1,0 @@
-{
-  gStyle->SetPalette(51);
-}
