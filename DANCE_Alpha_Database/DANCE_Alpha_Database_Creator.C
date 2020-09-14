@@ -20,7 +20,7 @@
 //User Input.............................................//
 
 //Number of runs to include
-const int nruns = 3;
+const int nruns = 1;
 
 //These are the runs that will be included in the database
 //Int_t run_numbers[nruns] = {38108 , 38109 , 38110 };  
@@ -30,7 +30,7 @@ const int nruns = 3;
 
 //Int_t run_numbers[nruns] = {67323,67324,67325};  
 //Int_t run_numbers[nruns] = {104746, 104747, 104748, 104749, 104750};  
-Int_t run_numbers[nruns] = {113391,113392,113393};
+Int_t run_numbers[nruns] = {117780};
 //Int_t run_numbers[nruns] = {100837,100838,100839,100840};  
 
 //Path to the root files
@@ -91,8 +91,8 @@ void DANCE_Alpha_Database_Creator() {
       hDanceGammaDatabase->SetName("hDanceGammaDatabase");
     }
     else {
-      hDanceAlphaDatabase->Add((TH2D*)fin->Get("hAlphaCalib"));
-      hDanceGammaDatabase->Add((TH2D*)fin->Get("hGammaCalib"));
+      hDanceAlphaDatabase->Add((TH2D*)fin->Get(alphahistname));
+      hDanceGammaDatabase->Add((TH2D*)fin->Get(gammahistname));
     }
     
     //Progress Statement

@@ -79,3 +79,4 @@ Run: 113800  0 Failed Fits
 Run: 113801  0 Failed Fits
 Run: 113800  0 Failed Fits
 Run: 113801  0 Failed Fits
+Run: 117774  8 Failed Fits (Detectors: 7 39 67 112 114 118 141 158)
