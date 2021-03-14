@@ -88,6 +88,7 @@ vector<int> rnums;  //RunNumbers
 
 double starting_slope[numberofdetectors];
 double starting_offset[numberofdetectors];
+double starting_quad[numberofdetectors];
 
 //Files
 TFile *fdatabase;  //database input file

@@ -16,7 +16,7 @@
 #for i in `seq 64137 64692`;  #Cu65
 #for i in `seq 64989 65265`;  #Cu65
 
-for i in `seq 104759 104763`;  #Cu63
+for i in `seq 104551 107233`;  #Cu63
 
 
 #for i in `seq 60828 60833`;  #Y88

@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
   
   double junkvalue=0;
   for(int i=0; i<162; i++) {
-    start>>junkvalue>>starting_offset[i]>>starting_slope[i]>>junkvalue>>junkvalue>>junkvalue;
+    start>>junkvalue>>starting_offset[i]>>starting_slope[i]>>starting_quad[i]>>junkvalue>>junkvalue;
     starting_offset[i] /= 1000.0;
     starting_slope[i] /= 1000.0;
       //  cout<<i<<" offset: "<<starting_offset[i]<<"  slope: "<<starting_slope[i]<<endl;
@@ -325,8 +325,8 @@ int main(int argc, char *argv[]) {
 
       ftot[j]->SetParLimits(1,-0.1,0.1);
       //cout << j << "\t" << starting_slope[j] << "\t" << 1.0*hProj[j]->GetMean()/(1.0*hDet[j]->GetMean()) << endl;
-      //ftot[j]->SetParLimits(0,0.00030,0.00042); 
-        ftot[j]->SetParLimits(0,0.00021,0.00035); //comment the line above and go back here for 2018 data
+      ftot[j]->SetParLimits(0,0.00030,0.00042);//this one is for 2019 onward 
+      //ftot[j]->SetParLimits(0,0.00021,0.00035); //comment the line above and go back here for 2018 data
 
       //ftot[j]->SetParameter(2,hProj[j]->Integral()/hDet[j]->Integral());
       //   ftot[j]->FixParameter(2,hProj[j]->Integral()/hDet[j]->Integral());
@@ -477,7 +477,7 @@ int main(int argc, char *argv[]) {
 	  //	  calibout<<j<<"  "<<1000.0*Offset[j]<<"  "<<1000.0*Slope[j]<<"  "<<0<<"  "<<0<<"  "<<12000.0*Slope[j]<<"\n";  //DANCE detectors
 	  //The short PSD gate was shortened before this block of runs
 	  if(rnums[i] > 100639) {
-	    calibout<<j<<"  "<<1000.0*Offset[j]<<"  "<<1000.0*Slope[j]<<"  "<<0<<"  "<<0<<"  "<<6000.0*Slope[j]<<"\n";  //DANCE detectors
+	    calibout<<j<<"  "<<1000.0*Offset[j]<<"  "<<1000.0*Slope[j]<<"  "<< starting_quad[j] <<"  "<<0<<"  "<<6000.0*Slope[j]<<"\n";  //DANCE detectors
 	    lastout<<j<<"  "<<1000.0*Offset[j]<<"  "<<1000.0*Slope[j]<<"  "<<0<<"  "<<0<<"  "<<6000.0*Slope[j]<<"\n";  //DANCE detectors
 	  }
 	  //Consistent PSD gate for all of CAEN 2015 and 2018 that I know (or care) about
